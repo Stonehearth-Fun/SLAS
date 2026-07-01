@@ -1,6 +1,6 @@
-# Smart Local AI
+# Smart Local AI Search
 
-`Smart Local AI` is a Stonehearth mod for the ACE environment focused on improving AI search behavior before expensive global candidate scans become the default path.
+`Smart Local AI Search` is a Stonehearth mod for the ACE environment focused on improving AI search behavior before expensive global candidate scans become the default path.
 
 The main idea is simple:
 - try nearby valid targets first
