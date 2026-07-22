@@ -1,9 +1,11 @@
 {
   "search_profile": "BALANCED",
-  "diagnostics_enabled": false,
+  "diagnostics_enabled": true,
   "diagnostics_player_id": "player_1",
   "diagnostics_log_interval_seconds": 60,
   "diagnostics_log_file_name": "slas_diagnostics.log",
+  "diagnostics_session_log_file_prefix": "slas_save_session",
+  "diagnostics_log_search_flow": true,
   "diagnostics_log_heavy_searches": true,
   "diagnostics_heavy_search_candidate_threshold": 300,
   "diagnostics_log_failed_searches": true,

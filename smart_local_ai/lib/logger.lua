@@ -1,4 +1,5 @@
 local SmartLocalAiSettings = require 'lib.settings'
+local SmartLocalAiSessionLog = require 'lib.session_log'
 
 local Logger = {}
 
@@ -44,16 +45,28 @@ local function _format_payload(payload, ordered_keys)
    return table.concat(parts, ' ')
 end
 
+local function _safe_format(message, ...)
+   local ok, formatted = pcall(string.format, message, ...)
+   if ok then
+      return formatted
+   end
+
+   return tostring(message)
+end
+
 function Logger.info(message, ...)
    log:info(message, ...)
+   SmartLocalAiSessionLog.write('INFO', _safe_format(message, ...))
 end
 
 function Logger.warn(message, ...)
    log:warning(message, ...)
+   SmartLocalAiSessionLog.write('WARN', _safe_format(message, ...))
 end
 
 function Logger.error(message, ...)
    log:error(message, ...)
+   SmartLocalAiSessionLog.write('ERROR', _safe_format(message, ...))
 end
 
 function Logger.override_active(name)
@@ -66,7 +79,7 @@ function Logger.override_active(name)
 end
 
 function Logger.summary(payload)
-   log:info('[SLAS:SUMMARY] %s', _format_payload(payload, {
+   local formatted = _format_payload(payload, {
       'time',
       'game_day',
       'settlers',
@@ -82,40 +95,84 @@ function Logger.summary(payload)
       'max_candidates',
       'profile',
       'overrides',
-   }))
+   })
+   log:info('[SLAS:SUMMARY] %s', formatted)
+   SmartLocalAiSessionLog.write_structured('INFO', 'SUMMARY', payload, 'summary')
 end
 
 function Logger.heavy_search(payload)
-   log:info('[SLAS:HEAVY_SEARCH] %s', _format_payload(payload, {
+   local formatted = _format_payload(payload, {
       'time',
       'action',
+      'description',
       'stage',
       'candidates',
+      'total_candidates',
       'result',
       'reason',
-   }))
+   })
+   log:info('[SLAS:HEAVY_SEARCH] %s', formatted)
+   SmartLocalAiSessionLog.write_structured('INFO', 'HEAVY_SEARCH', payload, 'heavy_search')
 end
 
 function Logger.failed_search(payload)
-   log:warning('[SLAS:FAILED_SEARCH] %s', _format_payload(payload, {
+   local formatted = _format_payload(payload, {
       'time',
       'action',
+      'description',
       'stage',
       'candidates',
+      'total_candidates',
       'fallback',
       'result',
       'reason',
-   }))
+   })
+   log:warning('[SLAS:FAILED_SEARCH] %s', formatted)
+   SmartLocalAiSessionLog.write_structured('WARN', 'FAILED_SEARCH', payload, 'failed_search')
 end
 
 function Logger.fallback(payload)
-   log:info('[SLAS:FALLBACK] %s', _format_payload(payload, {
+   local formatted = _format_payload(payload, {
       'time',
       'action',
+      'description',
       'stage',
       'candidates',
+      'total_candidates',
       'reason',
-   }))
+   })
+   log:info('[SLAS:FALLBACK] %s', formatted)
+   SmartLocalAiSessionLog.write_structured('INFO', 'FALLBACK', payload, 'fallback')
+end
+
+function Logger.issue(payload)
+   local formatted = _format_payload(payload, {
+      'time',
+      'action',
+      'description',
+      'reason',
+      'stage',
+      'entity',
+      'count',
+   })
+   log:warning('[SLAS:ISSUE] %s', formatted)
+   SmartLocalAiSessionLog.write_structured('WARN', 'ISSUE', payload, 'issue')
+end
+
+function Logger.search_flow(payload)
+   local formatted = _format_payload(payload, {
+      'time',
+      'action',
+      'description',
+      'event',
+      'stage',
+      'candidates',
+      'total_candidates',
+      'result',
+      'reason',
+   })
+   log:info('[SLAS:SEARCH_FLOW] %s', formatted)
+   SmartLocalAiSessionLog.write_structured('INFO', 'SEARCH_FLOW', payload, 'search_flow')
 end
 
 return Logger

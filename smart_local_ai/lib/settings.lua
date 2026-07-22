@@ -2,10 +2,12 @@ local Settings = {}
 
 local DEFAULT_SETTINGS = {
    search_profile = 'BALANCED',
-   diagnostics_enabled = false,
+   diagnostics_enabled = true,
    diagnostics_player_id = 'player_1',
    diagnostics_log_interval_seconds = 60,
    diagnostics_log_file_name = 'slas_diagnostics.log',
+   diagnostics_session_log_file_prefix = 'slas_save_session',
+   diagnostics_log_search_flow = true,
    diagnostics_log_heavy_searches = true,
    diagnostics_heavy_search_candidate_threshold = 300,
    diagnostics_log_failed_searches = true,
@@ -125,6 +127,8 @@ local function _normalize_settings(raw_settings)
    settings.diagnostics_player_id = _get_nested(raw_settings, { 'diagnostics', 'player_id' }, settings.diagnostics_player_id)
    settings.diagnostics_log_interval_seconds = _get_nested(raw_settings, { 'diagnostics', 'log_interval_seconds' }, settings.diagnostics_log_interval_seconds)
    settings.diagnostics_log_file_name = _get_nested(raw_settings, { 'diagnostics', 'log_file_name' }, settings.diagnostics_log_file_name)
+   settings.diagnostics_session_log_file_prefix = _get_nested(raw_settings, { 'diagnostics', 'session_log_file_prefix' }, settings.diagnostics_session_log_file_prefix)
+   settings.diagnostics_log_search_flow = _get_nested(raw_settings, { 'diagnostics', 'log_search_flow' }, settings.diagnostics_log_search_flow)
    settings.diagnostics_log_heavy_searches = _get_nested(raw_settings, { 'diagnostics', 'log_heavy_searches' }, settings.diagnostics_log_heavy_searches)
    settings.diagnostics_heavy_search_candidate_threshold = _get_nested(raw_settings, { 'diagnostics', 'heavy_search_candidate_threshold' }, settings.diagnostics_heavy_search_candidate_threshold)
    settings.diagnostics_log_failed_searches = _get_nested(raw_settings, { 'diagnostics', 'log_failed_searches' }, settings.diagnostics_log_failed_searches)
@@ -167,6 +171,7 @@ local function _normalize_settings(raw_settings)
    settings.search_log_interval = tonumber(settings.search_log_interval) or DEFAULT_SETTINGS.search_log_interval
    settings.global_fallback = settings.global_fallback ~= false
    settings.diagnostics_enabled = settings.diagnostics_enabled and true or false
+   settings.diagnostics_log_search_flow = settings.diagnostics_log_search_flow ~= false
    settings.debug_enabled = settings.debug_enabled and true or false
    settings.log_loaded_overrides = settings.log_loaded_overrides ~= false
    settings.log_search_stats = settings.log_search_stats and true or false

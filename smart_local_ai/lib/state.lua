@@ -20,6 +20,7 @@ local _counters = {
 }
 local _last_search_summary_at = 0
 local _loaded_overrides = {}
+local _issue_counts = {}
 
 local function _counter(name)
    _counters[name] = _counters[name] or 0
@@ -94,6 +95,28 @@ function State.log_patch_state(settings, patch_points)
       patch_summary,
       loaded_overrides ~= '' and loaded_overrides or 'none'
    )
+end
+
+function State.note_issue(kind, payload)
+   local SmartLocalAiLogger = require 'lib.logger'
+   local action = payload and payload.action or 'unknown'
+   local description = payload and payload.description or 'unknown'
+   local reason = payload and payload.reason or 'unknown'
+   local key = table.concat({ tostring(kind), tostring(action), tostring(description), tostring(reason) }, '|')
+
+   _issue_counts[key] = (_issue_counts[key] or 0) + 1
+   local count = _issue_counts[key]
+
+   if count == 1 or count % 5 == 0 then
+      local issue_payload = {}
+      if payload then
+         for name, value in pairs(payload) do
+            issue_payload[name] = value
+         end
+      end
+      issue_payload.count = count
+      SmartLocalAiLogger.issue(issue_payload)
+   end
 end
 
 function State.maybe_log_search_summary(settings)
